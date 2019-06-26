@@ -1,0 +1,5 @@
+env/
+venv/
+docs/build/
+__pycache__/
+.idea/
