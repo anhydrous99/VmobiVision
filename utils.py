@@ -129,3 +129,10 @@ def xy_maxmin(x_array, y_array):
 
 def get_text(sub_img):
     return pytesseract.image_to_string(Image.fromarray(sub_img))
+
+
+def read_labels(label_path):
+    labels = []
+    with open(label_path, 'r') as f:
+        labels.append(f.readline().split(': ')[1].replace('\n', ''))
+    return labels

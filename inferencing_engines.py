@@ -3,7 +3,7 @@ import pytesseract
 import numpy as np
 import cv2
 
-from utils import text_detection, sort_poly, xy_maxmin, get_text
+from utils import text_detection, sort_poly, xy_maxmin, get_text, read_labels
 
 
 class InferenceEngine:
@@ -41,7 +41,7 @@ class InferenceEngine:
 class ObjectDetectionEngine(InferenceEngine):
     def __init__(self, model_path_str, label_path_dir, score_threshold):
         InferenceEngine.__init__(self, model_path_str)
-        self.label_path_dir = label_path_dir
+        self.labels = read_labels(label_path_dir)
         self.score_threshold = score_threshold
 
     def change_score_threshold(self, score_threshold):
@@ -59,7 +59,7 @@ class ObjectDetectionEngine(InferenceEngine):
         ret_classes = []
         for index, cls in enumerate(classes):
             if scores[index] > self.score_threshold:
-                ret_classes.append(cls)
+                ret_classes.append(self.labels[cls])
         return ret_classes
 
 
