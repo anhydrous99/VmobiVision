@@ -1,6 +1,8 @@
 from PIL import Image
+from enum import Enum
 import pytesseract
 import numpy as np
+import keyboard
 import lanms
 import cv2
 
@@ -136,3 +138,13 @@ def read_labels(label_path):
     with open(label_path, 'r') as f:
         labels.append(f.readline().split(': ')[1].replace('\n', ''))
     return labels
+
+
+class Mode(Enum):
+    NONE = 1
+    ODM = 2
+    TDM = 3
+
+
+def wait_key(time, keys):
+    pass

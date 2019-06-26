@@ -1,8 +1,12 @@
+import cv2
+import time
 import argparse
+import keyboard
 from pathlib import Path
 
-from utils import file_check
+from utils import file_check, Mode
 from speech_tools import Speaker
+from inferencing_engines import ObjectDetectionEngine, TextDetectionEngine
 
 parser = argparse.ArgumentParser(
     description='Object Detection & Optical Text Recognition software',
@@ -19,6 +23,8 @@ parser.add_argument('-t', '--text_detection_model',
 parser.add_argument('-l', '--object_detection_label',
                     default='models/labels.txt',
                     help='Label file for object detection')
+parser.add_argument('-s', '--object_detection_threshold',
+                    default=80)
 parser.add_argument('--no_text_to_speech', action='store_true',
                     help='Use this to disable text to speech')
 args = parser.parse_args()
@@ -26,12 +32,40 @@ args = parser.parse_args()
 odm_path = Path(args.object_detection_model)
 tdm_path = Path(args.text_detection_model)
 odl_path = Path(args.object_detection_label)
+od_threshold = args.object_detection_threshold
 
+# Check if files exist
 file_check(odm_path)
 file_check(tdm_path)
 file_check(odl_path, '.txt')
 
+# Create text-to-speech instance
 spk = Speaker(rate=160, dontspeak=args.no_text_to_speech)
 
+# Say intro
 spk.say('Hello, welcome to i Mob e. Press o to switch to object detection mode. Press t to switch to text detection'
-        ' mode. Press s to start or stop speaking.')
+        ' mode. Press s to start or stop speaking. Press q to exit', True)
+
+keyboard.add_hotkey('q', quit)
+mode = Mode.NONE
+
+# Start Engines
+od_engine = ObjectDetectionEngine(str(odm_path), str(odl_path), od_threshold)
+td_engine = TextDetectionEngine(str(tdm_path))
+
+# Connect camera
+capture = cv2.VideoCapture(0)
+
+# Wait for camera to warm up
+time.sleep(0.4)
+
+# Check if connection with camera is successful
+if not capture.isOpened():
+    spk.say("Error: couldn't connect with camera.", True)
+    exit(1)
+
+# Loop through frames
+while capture.isOpened():
+    # Read current frame
+    _, frame = capture.read()
+    #
