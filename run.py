@@ -2,7 +2,7 @@ import argparse
 from pathlib import Path
 
 from utils import file_check
-from speech_tools import speaker
+from speech_tools import Speaker
 
 parser = argparse.ArgumentParser(
     description='Object Detection & Optical Text Recognition software',
@@ -31,7 +31,7 @@ file_check(odm_path)
 file_check(tdm_path)
 file_check(odl_path, '.txt')
 
-spk = speaker(rate=160, dontspeak=args.no_text_to_speech)
+spk = Speaker(rate=160, dontspeak=args.no_text_to_speech)
 
 spk.say('Hello, welcome to i Mob e. Press o to switch to object detection mode. Press t to switch to text detection'
         ' mode. Press s to start or stop speaking.')

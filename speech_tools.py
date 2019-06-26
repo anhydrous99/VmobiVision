@@ -1,7 +1,7 @@
 import pyttsx3
 
 
-class speaker:
+class Speaker:
     def __init__(self, rate=None, volume=None, voice_id=None, dontspeak=False):
         self.engine = pyttsx3.init()
         if rate is not None:

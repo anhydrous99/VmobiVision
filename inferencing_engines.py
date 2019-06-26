@@ -6,7 +6,7 @@ import cv2
 from utils import text_detection, sort_poly
 
 
-class inference_engine:
+class InferenceEngine:
     def __init__(self, model_path_str):
 
         # load trained model
@@ -32,14 +32,14 @@ class inference_engine:
         return out
 
 
-class object_detection_engine(inference_engine):
+class ObjectDetectionEngine(InferenceEngine):
     def __init__(self, model_path_str, label_path_dir):
-        inference_engine.__init__(self, model_path_str)
+        InferenceEngine.__init__(self, model_path_str)
 
 
-class text_detection_engine(inference_engine):
+class TextDetectionEngine(InferenceEngine):
     def __init__(self, model_path_str, text_img_size=(640, 640)):
-        inference_engine.__init__(self, model_path_str)
+        InferenceEngine.__init__(self, model_path_str)
         self.text_img_size = text_img_size
 
     def run_inference(self, image):
