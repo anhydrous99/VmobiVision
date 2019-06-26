@@ -16,9 +16,12 @@ class InferenceEngine:
         self.input_details = self.interpreter.get_input_details()
         self.output_details = self.interpreter.get_output_details()
 
+    def get_input_shape(self, index=0):
+        return self.input_details[index]['shape']
+
     def fill_input_tensors(self, list_of_numpy_arrays):
         for index, numpy_array in enumerate(list_of_numpy_arrays):
-            input_shape = self.input_details[index]['shape']
+            input_shape = self.get_input_shape(index)
             self.interpreter.set_tensor(self.input_details[index]['index'], numpy_array.reshape(input_shape))
 
     def invoke(self):
@@ -30,11 +33,34 @@ class InferenceEngine:
             out.append(self.interpreter.get_tensor(detail['index']))
         return out
 
+    def resize_to_network_input(self, image):
+        input_shape = self.get_input_shape()
+        return cv2.resize(image, (input_shape[1], input_shape[2]))
+
 
 class ObjectDetectionEngine(InferenceEngine):
-    def __init__(self, model_path_str, label_path_dir):
+    def __init__(self, model_path_str, label_path_dir, score_threshold):
         InferenceEngine.__init__(self, model_path_str)
         self.label_path_dir = label_path_dir
+        self.score_threshold = score_threshold
+
+    def change_score_threshold(self, score_threshold):
+        self.score_threshold = score_threshold
+
+    def run_inference(self, image):
+        img_resized = self.resize_to_network_input(image)
+        self.fill_input_tensors([img_resized])
+        self.invoke()
+        out_list = self.get_output_tensors()
+
+        classes = out_list[1]
+        scores = out_list[2]
+
+        ret_classes = []
+        for index, cls in enumerate(classes):
+            if scores[index] > self.score_threshold:
+                ret_classes.append(cls)
+        return ret_classes
 
 
 class TextDetectionEngine(InferenceEngine):
@@ -43,8 +69,8 @@ class TextDetectionEngine(InferenceEngine):
         self.text_img_size = text_img_size
 
     def run_inference(self, image):
-        input_shape = self.input_details[0]['shape']
-        img_resized = cv2.resize(image, (input_shape[1], input_shape[2]))
+        input_shape = self.get_input_shape()
+        img_resized = self.resize_to_network_input(image)
         self.fill_input_tensors([img_resized])
         self.invoke()
         out_list = self.get_output_tensors()
