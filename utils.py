@@ -2,7 +2,6 @@ from PIL import Image
 from enum import Enum
 import pytesseract
 import numpy as np
-import keyboard
 import lanms
 import cv2
 
@@ -144,7 +143,3 @@ class Mode(Enum):
     NONE = 1
     ODM = 2
     TDM = 3
-
-
-def wait_key(time, keys):
-    pass

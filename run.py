@@ -3,6 +3,7 @@ import time
 import argparse
 import keyboard
 from pathlib import Path
+from threading import Lock
 
 from utils import file_check, Mode
 from speech_tools import Speaker
@@ -46,8 +47,42 @@ spk = Speaker(rate=160, dontspeak=args.no_text_to_speech)
 spk.say('Hello, welcome to i Mob e. Press o to switch to object detection mode. Press t to switch to text detection'
         ' mode. Press s to start or stop speaking. Press q to exit', True)
 
-keyboard.add_hotkey('q', quit)
+# Create mutex locks for safe multi-threading
+mode_mutex = Lock()
+talk_mutex = Lock()
+
+# Create some global vars for signaling
 mode = Mode.NONE
+talk = False
+
+
+# Callback functions on key presses
+def o_callback():
+    global mode
+    with mode_mutex:
+        mode = Mode.ODM
+
+
+def t_callback():
+    global mode
+    with mode_mutex:
+        mode = Mode.TDM
+
+
+def s_callback():
+    global talk
+    with talk_mutex:
+        if talk:
+            talk = False
+        else:
+            talk = True
+
+
+# Assign callback keys to callback functions
+keyboard.add_hotkey('q', quit)
+keyboard.add_hotkey('o', o_callback)
+keyboard.add_hotkey('t', t_callback)
+keyboard.add_hotkey('s', s_callback)
 
 # Start Engines
 od_engine = ObjectDetectionEngine(str(odm_path), str(odl_path), od_threshold)
