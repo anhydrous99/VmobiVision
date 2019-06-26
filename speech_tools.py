@@ -11,10 +11,10 @@ class Speaker:
         if voice_id is not None:
             voices = self.engine.getProperty('voices')
             self.engine.setProperty('voice', voices[voice_id].id)
-        self.dontspeak = dontspeak
+        self.dont_speak = dontspeak
 
     def say(self, text, print_text=False):
-        if not self.dontspeak:
+        if not self.dont_speak:
             self.engine.say(text)
             print_text = True
         if print_text:
@@ -22,7 +22,7 @@ class Speaker:
         self.engine.runAndWait()
 
     def asyncsay(self, text, print_text=False):
-        if not self.dontspeak:
+        if not self.dont_speak:
             self.engine.say(text)
             print_text = True
         if print_text:
