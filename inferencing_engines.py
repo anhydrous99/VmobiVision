@@ -3,12 +3,11 @@ import pytesseract
 import numpy as np
 import cv2
 
-from utils import text_detection, sort_poly
+from utils import text_detection, sort_poly, xy_maxmin, get_text
 
 
 class InferenceEngine:
     def __init__(self, model_path_str):
-
         # load trained model
         self.interpreter = tf.lite.Interpreter(model_path=model_path_str)
         self.interpreter.allocate_tensors()
@@ -35,6 +34,7 @@ class InferenceEngine:
 class ObjectDetectionEngine(InferenceEngine):
     def __init__(self, model_path_str, label_path_dir):
         InferenceEngine.__init__(self, model_path_str)
+        self.label_path_dir = label_path_dir
 
 
 class TextDetectionEngine(InferenceEngine):
@@ -61,3 +61,8 @@ class TextDetectionEngine(InferenceEngine):
                 box = sort_poly(box.astype(np.int32))
                 if np.linalg.norm(box[0] - box[1]) < 5 or np.linalg.norm(box[3] - box[0]) < 5:
                     continue
+                (x_max, x_min), (y_max, y_min) = xy_maxmin(box[:, 0], box[:, 1])
+                sub_img = image[x_min:x_max, y_min:y_max]
+                output_text.append(get_text(sub_img))
+            return output_text
+        return None

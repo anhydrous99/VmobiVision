@@ -1,3 +1,5 @@
+from PIL import Image
+import pytesseract
 import numpy as np
 import lanms
 import cv2
@@ -115,3 +117,15 @@ def text_detection(score_map, geo_map, score_map_thresh=0.8, box_thresh=0.2, nms
         boxes[i, 8] = cv2.mean(score_map, mask)[0]
     boxes = boxes[boxes[:, 8] > box_thresh]
     return boxes
+
+
+def xy_maxmin(x_array, y_array):
+    x_max = np.max(x_array)
+    x_min = np.min(x_array)
+    y_max = np.max(y_array)
+    y_min = np.min(y_array)
+    return (x_max, x_min), (y_max, y_min)
+
+
+def get_text(sub_img):
+    return pytesseract.image_to_string(Image.fromarray(sub_img))
