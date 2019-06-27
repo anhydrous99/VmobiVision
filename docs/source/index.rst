@@ -18,6 +18,7 @@ for use with edge-TPUs, I'll add that functionality when I get a `coral <https:/
 
    installation
    usage
+   references
    license
 
 

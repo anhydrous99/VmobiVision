@@ -1,3 +1,8 @@
+"""
+inferencing_engines.py
+=============================================
+Where the inferencing engines/classes reside.
+"""
 import tensorflow as tf
 import numpy as np
 import cv2
@@ -6,7 +11,13 @@ from utils import text_detection, sort_poly, xy_maxmin, get_text, read_labels
 
 
 class InferenceEngine:
+    """Base inferencing class that wraps Tensorflow Lite"""
     def __init__(self, model_path_str):
+        """
+        Initializes InferenceEngine. Creates interpreter, allocates tensors, and grabs input and output details.
+
+        :param model_path_str: Path to Tensorflow Lite Model
+        """
         # load trained model
         self.interpreter = tf.lite.Interpreter(model_path=model_path_str)
         self.interpreter.allocate_tensors()
@@ -16,37 +27,82 @@ class InferenceEngine:
         self.output_details = self.interpreter.get_output_details()
 
     def get_input_shape(self, index=0):
+        """
+        Gets the shape of an input tensor
+
+        :param index: Index of input tensor
+        :return: Shape of tensor
+        """
         return self.input_details[index]['shape']
 
     def fill_input_tensors(self, list_of_numpy_arrays):
+        """
+        Fills the interpreter's input tensors
+
+        :param list_of_numpy_arrays: A list of the input tensors
+        """
         for index, numpy_array in enumerate(list_of_numpy_arrays):
             input_shape = self.get_input_shape(index)
             self.interpreter.set_tensor(self.input_details[index]['index'], numpy_array.reshape(input_shape))
 
     def invoke(self):
+        """
+        Invokes the interpreter. Basically has the interpreter run the needed calculation to have the output
+        tensors ready.
+        """
         self.interpreter.invoke()
 
     def get_output_tensors(self):
+        """
+        Gets the output tensors tensors from the interpreter, assuming the interpreter has been invoked.
+
+        :return: A list of output tensors (list of numpy arrays)
+        """
         out = []
         for detail in self.output_details:
             out.append(self.interpreter.get_tensor(detail['index']))
         return out
 
     def resize_to_network_input(self, image):
+        """
+        Resizes a numpy array to bee the same as the 0th index of the input tensors
+
+        :param image: The numpy array to resize
+        :return: A resized numpy array
+        """
         input_shape = self.get_input_shape()
         return cv2.resize(image, (input_shape[1], input_shape[2]))
 
 
 class ObjectDetectionEngine(InferenceEngine):
+    """Class that performs Object Detection"""
     def __init__(self, model_path_str, label_path_dir, score_threshold):
+        """
+        Initiates the ObjectDetectionEngine class.
+
+        :param model_path_str: Path to SSD object detection model
+        :param label_path_dir: Path to coco format labels
+        :param score_threshold: Threshold for detection in the form of a float between 0 and 1
+        """
         InferenceEngine.__init__(self, model_path_str)
         self.labels = read_labels(label_path_dir)
         self.score_threshold = score_threshold
 
     def change_score_threshold(self, score_threshold):
+        """
+        Changes the threshold for object detection
+
+        :param score_threshold: A float between 0 and 1
+        """
         self.score_threshold = score_threshold
 
     def run_inference(self, image):
+        """
+        Performs the inferencing
+
+        :param image: An image(numpy array) to perform inferencing on
+        :return: List of the names of detected objects, returns empty list if no object is detected
+        """
         img_resized = self.resize_to_network_input(image)
         self.fill_input_tensors([img_resized])
         self.invoke()
@@ -64,10 +120,22 @@ class ObjectDetectionEngine(InferenceEngine):
 
 
 class TextDetectionEngine(InferenceEngine):
+    """Class that performs Optical Text Recognition"""
     def __init__(self, model_path_str):
+        """
+        Initiates the TextDetectionEngine class
+
+        :param model_path_str: A path to the EAST model
+        """
         InferenceEngine.__init__(self, model_path_str)
 
     def run_inference(self, image):
+        """
+        Performs the inferencing and OCR
+
+        :param image: An image(numpy array) to perform inferencing on
+        :return: List of text detected, returns empty list of no object is detected
+        """
         input_shape = self.get_input_shape()
         img_resized = self.resize_to_network_input(image)
         img_resized = (img_resized / 127.5) - 1
