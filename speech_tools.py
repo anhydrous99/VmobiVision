@@ -16,6 +16,7 @@ class Speaker:
     def say(self, text, print_text=False):
         if not self.dont_speak:
             self.engine.say(text)
+        else:
             print_text = True
         if print_text:
             print(text)
@@ -24,6 +25,7 @@ class Speaker:
     def asyncsay(self, text, print_text=False):
         if not self.dont_speak:
             self.engine.say(text)
+        else:
             print_text = True
         if print_text:
             print(text)

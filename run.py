@@ -19,7 +19,7 @@ parser.add_argument('-o', '--object_detection_model',
                     default='models/ssd_mobilenet_v2_quantized_300x300_2019_01_03.tflite',
                     help='The model file for object detection')
 parser.add_argument('-t', '--text_detection_model',
-                    default='models/east_mobilenet_v2_quantized_512x512_2019_06_11.tflite',
+                    default='models/east_mobilenet_v2_cocotext.tflite',
                     help='The model file for text detection')
 parser.add_argument('-l', '--object_detection_label',
                     default='models/labels.txt',
@@ -50,10 +50,12 @@ spk.say('Hello, welcome to i Mob e. Press o to switch to object detection mode. 
 # Create mutex locks for safe multi-threading
 mode_mutex = Lock()
 talk_mutex = Lock()
+stop_mutex = Lock()
 
 # Create some global vars for signaling
 mode = Mode.NONE
 talk = False
+stop = False
 
 
 # Callback functions on key presses
@@ -76,6 +78,12 @@ def s_callback():
             talk = False
         else:
             talk = True
+
+
+def q_callback():
+    global stop
+    with stop_mutex:
+        stop = True
 
 
 # Assign callback keys to callback functions
@@ -101,6 +109,24 @@ if not capture.isOpened():
 
 # Loop through frames
 while capture.isOpened():
+
     # Read current frame
     _, frame = capture.read()
-    #
+
+    with mode_mutex:
+        if mode == Mode.ODM:
+            classes = od_engine.run_inference(frame)
+            for cls in classes:
+                spk.asyncsay(cls)
+            spk.wait()
+        elif mode == Mode.TDM:
+            found_text = td_engine.run_inference(frame)
+            for text in found_text:
+                spk.asyncsay(text)
+            spk.wait()
+
+    with stop_mutex:
+        if stop:
+            break
+
+capture.release()

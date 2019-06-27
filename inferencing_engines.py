@@ -41,7 +41,7 @@ class ObjectDetectionEngine(InferenceEngine):
     def __init__(self, model_path_str, label_path_dir, score_threshold):
         InferenceEngine.__init__(self, model_path_str)
         self.labels = read_labels(label_path_dir)
-        self.score_threshold = int(127 * score_threshold + 127)
+        self.score_threshold = score_threshold
 
     def change_score_threshold(self, score_threshold):
         self.score_threshold = score_threshold
@@ -52,24 +52,26 @@ class ObjectDetectionEngine(InferenceEngine):
         self.invoke()
         out_list = self.get_output_tensors()
 
-        classes = out_list[1]
-        scores = out_list[2]
+        classes = out_list[1][0]
+        scores = out_list[2][0]
 
         ret_classes = []
         for index, cls in enumerate(classes):
-            if scores[index] > self.score_threshold:
-                ret_classes.append(self.labels[cls])
+            cls += 1
+            if scores[index] > self.score_threshold and int(cls) != 0:
+                ret_classes.append(self.labels[int(cls)])
         return ret_classes
 
 
 class TextDetectionEngine(InferenceEngine):
-    def __init__(self, model_path_str, text_img_size=(640, 640)):
+    def __init__(self, model_path_str):
         InferenceEngine.__init__(self, model_path_str)
-        self.text_img_size = text_img_size
 
     def run_inference(self, image):
         input_shape = self.get_input_shape()
         img_resized = self.resize_to_network_input(image)
+        img_resized = (img_resized / 127.5) - 1
+        img_resized = img_resized.astype(np.float32)
         self.fill_input_tensors([img_resized])
         self.invoke()
         out_list = self.get_output_tensors()
@@ -77,9 +79,9 @@ class TextDetectionEngine(InferenceEngine):
         boxes = text_detection(score_map=out_list[0], geo_map=out_list[1])
 
         if boxes is not None:
-            boxes = boxes[:, :0].reshape((-1, 4, 2))
-            boxes[:, :, 0] *= self.text_img_size[0] / input_shape[1]
-            boxes[:, :, 1] *= self.text_img_size[1] / input_shape[2]
+            boxes = boxes[:, :8].reshape((-1, 4, 2))
+            boxes[:, :, 0] /= input_shape[1] / image.shape[1]
+            boxes[:, :, 1] /= input_shape[2] / image.shape[0]
 
             output_text = []
             for box in boxes:
@@ -87,7 +89,9 @@ class TextDetectionEngine(InferenceEngine):
                 if np.linalg.norm(box[0] - box[1]) < 5 or np.linalg.norm(box[3] - box[0]) < 5:
                     continue
                 (x_max, x_min), (y_max, y_min) = xy_maxmin(box[:, 0], box[:, 1])
-                sub_img = image[x_min:x_max, y_min:y_max]
-                output_text.append(get_text(sub_img))
+                sub_img = image[y_min:y_max, x_min:x_max]
+                txt = get_text(sub_img)
+                if txt != '':
+                    output_text.append(get_text(sub_img))
             return output_text
-        return None
+        return []
