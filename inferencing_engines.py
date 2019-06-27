@@ -41,7 +41,7 @@ class ObjectDetectionEngine(InferenceEngine):
     def __init__(self, model_path_str, label_path_dir, score_threshold):
         InferenceEngine.__init__(self, model_path_str)
         self.labels = read_labels(label_path_dir)
-        self.score_threshold = score_threshold
+        self.score_threshold = int(127 * score_threshold + 127)
 
     def change_score_threshold(self, score_threshold):
         self.score_threshold = score_threshold

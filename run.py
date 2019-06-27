@@ -25,7 +25,7 @@ parser.add_argument('-l', '--object_detection_label',
                     default='models/labels.txt',
                     help='Label file for object detection')
 parser.add_argument('-s', '--object_detection_threshold',
-                    default=80)
+                    default=0.8)
 parser.add_argument('--no_text_to_speech', action='store_true',
                     help='Use this to disable text to speech')
 args = parser.parse_args()
@@ -85,7 +85,7 @@ keyboard.add_hotkey('t', t_callback)
 keyboard.add_hotkey('s', s_callback)
 
 # Start Engines
-od_engine = ObjectDetectionEngine(str(odm_path), str(odl_path), od_threshold)
+#od_engine = ObjectDetectionEngine(str(odm_path), str(odl_path), od_threshold)
 td_engine = TextDetectionEngine(str(tdm_path))
 
 # Connect camera
