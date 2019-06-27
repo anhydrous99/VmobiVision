@@ -19,7 +19,7 @@ parser.add_argument('-o', '--object_detection_model',
                     default='models/ssd_mobilenet_v2_quantized_300x300_2019_01_03.tflite',
                     help='The model file for object detection')
 parser.add_argument('-t', '--text_detection_model',
-                    default='models/east_mobilenet_v2_quantized_512x512_11_06_2019.tflite',
+                    default='models/east_mobilenet_v2_quantized_512x512_2019_06_11.tflite',
                     help='The model file for text detection')
 parser.add_argument('-l', '--object_detection_label',
                     default='models/labels.txt',
@@ -85,7 +85,7 @@ keyboard.add_hotkey('t', t_callback)
 keyboard.add_hotkey('s', s_callback)
 
 # Start Engines
-#od_engine = ObjectDetectionEngine(str(odm_path), str(odl_path), od_threshold)
+od_engine = ObjectDetectionEngine(str(odm_path), str(odl_path), od_threshold)
 td_engine = TextDetectionEngine(str(tdm_path))
 
 # Connect camera
