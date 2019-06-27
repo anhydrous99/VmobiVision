@@ -44,8 +44,8 @@ file_check(odl_path, '.txt')
 spk = Speaker(rate=160, dontspeak=args.no_text_to_speech)
 
 # Say intro
-spk.say('Hello, welcome to i Mob e. Press o to switch to object detection mode. Press t to switch to text detection'
-        ' mode. Press s to start or stop speaking. Press q to exit', True)
+spk.say('Hello, welcome to iMobi. Press o to switch to object detection mode. Press t to switch to text detection'
+        ' mode. Press q to exit', True)
 
 # Create mutex locks for safe multi-threading
 mode_mutex = Lock()
@@ -62,22 +62,19 @@ stop = False
 def o_callback():
     global mode
     with mode_mutex:
-        mode = Mode.ODM
+        if mode != Mode.ODM:
+            mode = Mode.ODM
+        else:
+            mode = Mode.NONE
 
 
 def t_callback():
     global mode
     with mode_mutex:
-        mode = Mode.TDM
-
-
-def s_callback():
-    global talk
-    with talk_mutex:
-        if talk:
-            talk = False
+        if mode != Mode.TDM:
+            mode = Mode.TDM
         else:
-            talk = True
+            mode = Mode.NONE
 
 
 def q_callback():
@@ -87,10 +84,9 @@ def q_callback():
 
 
 # Assign callback keys to callback functions
-keyboard.add_hotkey('q', quit)
+keyboard.add_hotkey('q', q_callback)
 keyboard.add_hotkey('o', o_callback)
 keyboard.add_hotkey('t', t_callback)
-keyboard.add_hotkey('s', s_callback)
 
 # Start Engines
 od_engine = ObjectDetectionEngine(str(odm_path), str(odl_path), od_threshold)
