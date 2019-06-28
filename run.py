@@ -1,8 +1,7 @@
 """
 run.py
 ========================
-The core module of iMobi
-Please usage for more information
+The core module of iMobi. See usage documentation for more information.
 """
 
 import cv2

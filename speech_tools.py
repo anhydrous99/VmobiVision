@@ -59,6 +59,6 @@ class Speaker:
 
     def runAndWait(self):
         """
-        When using the asyncsay function use this function to use text to speech n the queued text
+        When using the asyncsay function use this function to run queued text
         """
         self.engine.runAndWait()
