@@ -18,7 +18,7 @@ between 0 and 255, would result in the score only being able to be 0 or 1 and no
 to retrain the model so that the scores are between 0 and 256 or so that the location mapping is between 0 and 1.
 Not to mention, the input images are scales to between -1 and 1, it would result in a better model if it is scaled
 to either between 0 and 256 or between 0 and 1. Once that is done, quantization of the model would be trivial.
-This will be done at my EAST model github page where the progress can be seen <https://github.com/anhydrous99/EAST>.
+This can be done at my EAST model github page where the progress can be seen <https://github.com/anhydrous99/EAST>.
 
 The project uses the keyboard python package that takes low level control of the keyboard, allowing the ability
 to use assign global hotkey. This, however, requires sudo permission. We can then assign these keys to specific
