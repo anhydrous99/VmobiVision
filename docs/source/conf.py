@@ -17,7 +17,7 @@ sys.path.insert(0, os.path.abspath('../..'))
 
 # -- Project information -----------------------------------------------------
 
-project = 'iMobi'
+project = 'Vmobi'
 copyright = '2019, Armando Herrera'
 author = 'Armando Herrera'
 

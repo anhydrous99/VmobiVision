@@ -1,7 +1,7 @@
 """
 run.py
 ========================
-The core module of iMobi. See usage documentation for more information.
+The core module of Vmobi. See usage documentation for more information.
 """
 
 import cv2
@@ -54,17 +54,15 @@ def main():
     spk = Speaker(rate=160, dontspeak=args.no_text_to_speech)
 
     # Say intro
-    spk.say('Hello, welcome to iMobi. Press o to switch to object detection mode. Press t to switch to text detection'
+    spk.say('Hello, welcome to Vmobi. Press o to switch to object detection mode. Press t to switch to text detection'
             ' mode. Press q to exit', True)
 
     # Create mutex locks for safe multi-threading
     mode_mutex = Lock()
-    talk_mutex = Lock()
     stop_mutex = Lock()
 
     # Create some global vars for signaling
     mode = Mode.NONE
-    talk = False
     stop = False
 
 

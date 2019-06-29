@@ -1,4 +1,4 @@
-iMobi
+Vmobi
 =====
 
 This is the documentation for iMobi's python software. A python program that does headless object detection
