@@ -47,7 +47,7 @@ to do that, you can run::
 
     sudo apt update
     sudo apt install build-essential git cmake python3-dev python3-venv python3-pip \
-                     libespeak-dev libtesseract-dev
+                     libespeak-dev libtesseract-dev libhdf5-dev
     git clone https://github.com/anhydrous99/Vmobi
     cd Vmobi
     python3 -m venv venv
@@ -70,7 +70,7 @@ You can how ever download the tensorflow binary provided by NVIDIA::
 
     sudo apt update
     sudo apt install build-essential git cmake python3-dev python3-venv python3-pip \
-                     libespeak-dev libtesseract-dev
+                     libespeak-dev libtesseract-dev libhdf5-dev
     git clone https://github.com/anhydrous99/Vmobi
     cd Vmobi
     python3 -m venv venv
