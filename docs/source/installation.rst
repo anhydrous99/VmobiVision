@@ -34,6 +34,7 @@ First make sure you have xcode and git installed then in an arbitrary directory 
     python setup.py install
 
 For linking reasons don't delete the lanms directory, otherwise it won't work.
+
 Raspberry Pi
 ^^^^^^^^^^^^
 On the Pi we need to have the camera's kernel module load on startup. You can do that by running the following::
