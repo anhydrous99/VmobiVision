@@ -75,13 +75,13 @@ You can how ever download the tensorflow binary provided by NVIDIA::
     cd Vmobi
     python3 -m venv venv
     source venv/bin/activate
-    pip3 install --upgrade pip
-    pip3 install cython pytest setuptools
-    pip3 install https://github.com/numpy/numpy/releases/download/v1.16.4/numpy-1.16.4.zip
-    pip3 install pyttsx3 Sphinx sphinx-glpi-theme scipy pytesseract Pillow keyboard
-    ENABLE_HEADLESS=1 pip3 install git+https://github.com/skvark/opencv-python
-    pip3 install git+https://github.com/safijari/lanms
-    pip3 install https://developer.download.nvidia.com/compute/redist/jp/v42/tensorflow-gpu/tensorflow_gpu-1.13.1+nv19.5-cp36-cp36m-linux_aarch64.whl
+    pip install --upgrade pip
+    pip install cython pytest setuptools keyboard
+    pip install https://github.com/numpy/numpy/releases/download/v1.16.4/numpy-1.16.4.zip
+    pip install pyttsx3 Sphinx sphinx-glpi-theme scipy pytesseract Pillow keyboard
+    ENABLE_HEADLESS=1 pip install git+https://github.com/skvark/opencv-python
+    pip install git+https://github.com/safijari/lanms
+    pip install https://developer.download.nvidia.com/compute/redist/jp/v42/tensorflow-gpu/tensorflow_gpu-1.13.1+nv19.5-cp36-cp36m-linux_aarch64.whl
 
 Coral
 ^^^^^
