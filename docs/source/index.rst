@@ -44,16 +44,16 @@ fully quantized one.::
 
     OUTPUT_FILE=ssd_mobilenet_v2_quantized_300x300_coco_2019_01_03.tflite
     OUTPUT_ARRAYS='TFLite_Detection_PostProcess','TFLite_Detection_PostProcess:1','TFLite_Detection_PostProcess:2','TFLite_Detection_PostProcess:3'
-    tflite_convert --graph_def_file=tflite_graph.pb \
-                   --output_file=${OUTPUT_FILE} \
-                   --output_format=TFLITE \
-                   --input_shape=1,300,300,3 \
+    tflite_convert --graph_def_file=tflite_graph.pb             \
+                   --output_file=${OUTPUT_FILE}                 \
+                   --output_format=TFLITE                       \
+                   --input_shape=1,300,300,3                    \
                    --input_arrays=normalized_input_image_tensor \
-                   --output_arrays=${OUTPUT_ARRAYS} \
-                   --inference_type=QUANTIZED_UINT8 \
-                   --allow_custom_ops \
-                   --mean_values=127 \
-                   --std_dev_values=127 \
+                   --output_arrays=${OUTPUT_ARRAYS}             \
+                   --inference_type=QUANTIZED_UINT8             \
+                   --allow_custom_ops                           \
+                   --mean_values=127                            \
+                   --std_dev_values=127                         \
                    --default_ranges_min=0 --default_ranges_max=6
 
 To run on the edge TPU on a coral, the tensorflow lite model then needs to compiled according to this guide

@@ -61,27 +61,34 @@ to do that, you can run::
     cd lanms
     python setup.py install
     cd ..
-    rm -r lanms
 
 Jetson Nano
 ^^^^^^^^^^^
 Installing the dependencies on the nano is similar to the pi except pypl has no binary for tensorflow.
-You can how ever download the tensorflow binary provided by NVIDIA::
+You can how ever download the tensorflow binary provided by NVIDIA. We will have to build numpy, scipy, opencv-python
+and lanms, aswell.::
 
     sudo apt update
-    sudo apt install build-essential git cmake python3-dev python3-venv python3-pip \
-                     libespeak-dev libtesseract-dev libhdf5-dev
+    sudo apt install build-essential gfortran git cmake python3-dev python3-venv \
+                     python3-pip libespeak-dev libtesseract-dev libhdf5-dev      \
+                     libopenblas-dev
     git clone https://github.com/anhydrous99/Vmobi
     cd Vmobi
     python3 -m venv venv
     source venv/bin/activate
     pip install --upgrade pip
-    pip install cython pytest setuptools keyboard
+    pip install cython pytest setuptools
     pip install https://github.com/numpy/numpy/releases/download/v1.16.4/numpy-1.16.4.zip
-    pip install pyttsx3 Sphinx sphinx-glpi-theme scipy pytesseract Pillow keyboard
+    pip install https://github.com/scipy/scipy/releases/download/v1.2.2/scipy-1.2.2.zip
+    pip install pyttsx3 Sphinx sphinx-glpi-theme pytesseract Pillow keyboard
     ENABLE_HEADLESS=1 pip install git+https://github.com/skvark/opencv-python
-    pip install git+https://github.com/safijari/lanms
     pip install https://developer.download.nvidia.com/compute/redist/jp/v42/tensorflow-gpu/tensorflow_gpu-1.13.1+nv19.5-cp36-cp36m-linux_aarch64.whl
+    git clone --recursive https://github.com/safijari/lanms
+    cd lanms
+    python setup.py install
+    cd ..
+
+Make sure not to delete the lanms folder.
 
 Coral
 ^^^^^
