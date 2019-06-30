@@ -11,14 +11,9 @@ with the base convolution architecture begin the MobileNet V2 architecture. `Tes
 One of the qoals is to have all models quantized and trained with `quantization-aware training
 <https://github.com/tensorflow/tensorflow/tree/master/tensorflow/contrib/quantize>`_ for use with edge-TPUs.
 
-Currently, only object detection is quantized and therefore runnable on a coral's TPU. The reason for this is the
-difference in scaling between the predicted location mapping and their scores. The current model's location mapping
-ranges from 0 to 256 and the score are between 0 and 1. Since scaling both to unsigned 8 bit integers, quantized
-between 0 and 255, would result in the score only being able to be 0 or 1 and not in between. To fix this, we need
-to retrain the model so that the scores are between 0 and 256 or so that the location mapping is between 0 and 1.
-Not to mention, the input images are scales to between -1 and 1, it would result in a better model if it is scaled
-to either between 0 and 256 or between 0 and 1. Once that is done, quantization of the model would be trivial.
-This can be done at my EAST model github page where the progress can be seen <https://github.com/anhydrous99/EAST>.
+Currently, only the Object Detection model is quantized due to the limitations of TPU operations. Please see recent
+commits on the model's github repository <https://github.com/anhydrous99/EAST>. If you find an issue, bug, or have a
+feature request please submit an issue on this project's github repository <https://github.com/anhydrous99/Vmobi>.
 
 The project uses the keyboard python package that takes low level control of the keyboard, allowing the ability
 to use assign global hotkey. This, however, requires sudo permission. We can then assign these keys to specific
