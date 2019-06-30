@@ -199,10 +199,10 @@ def read_labels(label_path):
 def dequantize(array, mean, standard_deviation):
     """
     Converts a quantized uint8 tensor (numpy array) and converts to the it's real value
+
     :param array: quantized uint8 nD numpy array
     :param mean: integer value between 0 and 255 that maps to the floating point number 0.0f
-    :param standard_deviation: integer value representing floating point number range -
-    calculated by 255 / (float_max - float_min)
+    :param standard_deviation: integer value representing floating point number range - calculated by 255 / (float_max - float_min)
     :return: A dequantized 32 bit float nD numpy array
     """
     return (array.astype(np.float32) - mean) / standard_deviation
