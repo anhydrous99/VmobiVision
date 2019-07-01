@@ -15,6 +15,7 @@ from utils import file_check, Mode
 from speech_tools import Speaker
 from inferencing_engines import ObjectDetectionEngine, TextDetectionEngine
 
+
 def main():
     """
     The core function of the program
@@ -65,7 +66,6 @@ def main():
     mode = Mode.NONE
     stop = False
 
-
     # Callback functions on key presses
     def o_callback():
         global mode
@@ -75,7 +75,6 @@ def main():
             else:
                 mode = Mode.NONE
 
-
     def t_callback():
         global mode
         with mode_mutex:
@@ -84,12 +83,10 @@ def main():
             else:
                 mode = Mode.NONE
 
-
     def q_callback():
         global stop
         with stop_mutex:
             stop = True
-
 
     # Assign callback keys to callback functions
     keyboard.add_hotkey('q', q_callback)
@@ -134,6 +131,7 @@ def main():
                 break
 
     capture.release()
+
 
 if __name__ == "__main__":
     main()

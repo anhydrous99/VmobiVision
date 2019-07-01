@@ -33,7 +33,7 @@ First make sure you have xcode and git installed then in an arbitrary directory 
     cd lanms
     python setup.py install
 
-For linking reasons don't delete the lanms directory, otherwise it won't work.
+For linking reasons don't delete the lanms directory otherwise, it won't work.
 
 Raspberry Pi
 ^^^^^^^^^^^^
