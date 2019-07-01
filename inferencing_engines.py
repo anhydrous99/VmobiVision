@@ -145,13 +145,15 @@ class TextDetectionEngine(InferenceEngine):
         out_list = self.get_output_tensors()
 
         # model outputs 3 tensors now, normalized to between 0 and 1
+        score_map = dequantize(out_list[0], 128, 127)
         geo_loc_map = dequantize(out_list[1], 128, 127)
         geo_angle = dequantize(out_list[2], 128, 127)
-        geo_loc_map = geo_loc_map * input_shape[1]
-        geo_angle = (geo_angle - 0.5) * np.pi  / 2
+        score_map = (score_map + 1) * 0.5
+        geo_loc_map = (geo_loc_map + 1) * input_shape[1] / 2
+        geo_angle = 0.7853981633974483 * geo_angle
         geo_map = np.concatenate((geo_loc_map, geo_angle), axis=3)
 
-        boxes = text_detection(score_map=out_list[0], geo_map=geo_map)
+        boxes = text_detection(score_map=score_map, geo_map=geo_map)
 
         if boxes is not None:
             boxes = boxes[:, :8].reshape((-1, 4, 2))
