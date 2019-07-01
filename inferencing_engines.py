@@ -7,7 +7,7 @@ import tensorflow as tf
 import numpy as np
 import cv2
 
-from utils import text_detection, sort_poly, xy_maxmin, get_text, read_labels
+from utils import text_detection, sort_poly, xy_maxmin, get_text, read_labels, dequantize
 
 
 class InferenceEngine:
@@ -144,7 +144,16 @@ class TextDetectionEngine(InferenceEngine):
         self.invoke()
         out_list = self.get_output_tensors()
 
-        boxes = text_detection(score_map=out_list[0], geo_map=out_list[1])
+        # model outputs 3 tensors now, normalized to between 0 and 1
+        score_map = dequantize(out_list[0], 128, 127)
+        geo_loc_map = dequantize(out_list[1], 128, 127)
+        geo_angle = dequantize(out_list[2], 128, 127)
+        score_map = (score_map + 1) * 0.5
+        geo_loc_map = (geo_loc_map + 1) * input_shape[1] / 2
+        geo_angle = 0.7853981633974483 * geo_angle
+        geo_map = np.concatenate((geo_loc_map, geo_angle), axis=3)
+
+        boxes = text_detection(score_map=score_map, geo_map=geo_map)
 
         if boxes is not None:
             boxes = boxes[:, :8].reshape((-1, 4, 2))
