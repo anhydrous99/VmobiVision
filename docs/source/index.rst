@@ -11,9 +11,10 @@ with the base convolution architecture begin the MobileNet V2 architecture. `Tes
 One of the qoals is to have all models quantized and trained with `quantization-aware training
 <https://github.com/tensorflow/tensorflow/tree/master/tensorflow/contrib/quantize>`_ for use with edge-TPUs.
 
-Currently, only the Object Detection model is quantized due to the limitations of TPU operations. Please see recent
-commits on the model's github repository <https://github.com/anhydrous99/EAST>. If you find an issue, bug, or have a
-feature request please submit an issue on this project's github repository <https://github.com/anhydrous99/Vmobi>.
+Currently, both models are quantized and can run on edge TPUs but that code would need to be written and
+the models converted. Please see recent commits on the model's github repository <https://github.com/anhydrous99/EAST>.
+If you find an issue, bug, or have a feature request please submit an issue on this project's github repository
+<https://github.com/anhydrous99/Vmobi>.
 
 The project uses the keyboard python package that takes low level control of the keyboard, allowing the ability
 to use assign global hotkey. This, however, requires sudo permission. We can then assign these keys to specific
@@ -59,7 +60,7 @@ project or want the project to be public let me know.
 
 Currently, to train the EAST model you can follow the instructions on the `github page
 <https://github.com/anhydrous99/EAST>`_. If you would like to make changes to the EAST project create a fork and
-submit pull requests of the changes.
+submit pull requests for changes.
 
 .. toctree::
    :maxdepth: 2
