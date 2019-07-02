@@ -15,6 +15,10 @@ from utils import file_check, Mode
 from speech_tools import Speaker
 from inferencing_engines import ObjectDetectionEngine, TextDetectionEngine
 
+# Create some global vars for signaling
+mode = Mode.NONE
+stop = False
+
 
 def main():
     """
@@ -30,7 +34,7 @@ def main():
                         default='models/ssd_mobilenet_v2_quantized_300x300_2019_01_03.tflite',
                         help='The model file for object detection')
     parser.add_argument('-t', '--text_detection_model',
-                        default='models/east_mobilenet_v2_cocotext.tflite',
+                        default='models/east_mobilenet_v2_quantized_512x512_2019_06_11.tflite',
                         help='The model file for text detection')
     parser.add_argument('-l', '--object_detection_label',
                         default='models/labels.txt',
@@ -61,10 +65,6 @@ def main():
     # Create mutex locks for safe multi-threading
     mode_mutex = Lock()
     stop_mutex = Lock()
-
-    # Create some global vars for signaling
-    mode = Mode.NONE
-    stop = False
 
     # Callback functions on key presses
     def o_callback():
@@ -118,13 +118,11 @@ def main():
             if mode == Mode.ODM:
                 classes = od_engine.run_inference(frame)
                 for cls in classes:
-                    spk.asyncsay(cls)
-                spk.runAndWait()
+                    spk.say(cls)
             elif mode == Mode.TDM:
                 found_text = td_engine.run_inference(frame)
                 for text in found_text:
-                    spk.asyncsay(text)
-                spk.runAndWait()
+                    spk.say(text)
 
         with stop_mutex:
             if stop:

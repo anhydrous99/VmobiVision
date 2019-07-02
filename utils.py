@@ -138,7 +138,6 @@ def text_detection(score_map, geo_map, score_map_thresh=0.8, box_thresh=0.1, nms
     # sort the text boxes via the y axis
     xy_text = xy_text[np.argsort(xy_text[:, 0])]
     text_box_restored = restore_rectangle(xy_text[:, ::-1] * 4, geo_map[xy_text[:, 0], xy_text[:, 1], :])  # N*4*2
-    #print('{} text boxes before nms'.format(text_box_restored.shape[0]))
     boxes = np.zeros((text_box_restored.shape[0], 9), dtype=np.float32)
     boxes[:, :8] = text_box_restored.reshape((-1, 8))
     boxes[:, 8] = score_map[xy_text[:, 0], xy_text[:, 1]]
@@ -147,7 +146,7 @@ def text_detection(score_map, geo_map, score_map_thresh=0.8, box_thresh=0.1, nms
     if boxes.shape[0] == 0:
         return None
 
-    # here we filter some low score boxes by the average score map, this is different from the orginal paper
+    # here we filter some low score boxes by the average score map, this is different from the original paper
     for i, box in enumerate(boxes):
         mask = np.zeros_like(score_map, dtype=np.uint8)
         cv2.fillPoly(mask, box[:8].reshape((-1, 4, 2)).astype(np.int32) // 4, 1)
@@ -194,6 +193,18 @@ def read_labels(label_path):
         for line in f:
             labels.append(line.split(': ')[1].replace('\n', ''))
     return labels
+
+
+def quantize(array, mean, standard_deviation):
+    """
+    Converts a 32 bit floating point numpy array and converts it to a quantized 8 bit unsigned integer numpy array
+
+    :param array: 32 bit floating point nD numpy array
+    :param mean: integer value between 0 and 255 that maps to the floating point number 0.0f
+    :param standard_deviation:  integer value representing floating point number range - calculated by 255 / (float_max - float_min)
+    :return: A quantized 8 bit unsigned nD numpy array
+    """
+    return (array * standard_deviation + mean).astype(np.uint8)
 
 
 def dequantize(array, mean, standard_deviation):

@@ -7,7 +7,7 @@ import tensorflow as tf
 import numpy as np
 import cv2
 
-from utils import text_detection, sort_poly, xy_maxmin, get_text, read_labels, dequantize
+from utils import text_detection, sort_poly, xy_maxmin, get_text, read_labels, dequantize, quantize
 
 
 class InferenceEngine:
@@ -139,7 +139,7 @@ class TextDetectionEngine(InferenceEngine):
         input_shape = self.get_input_shape()
         img_resized = self.resize_to_network_input(image)
         img_resized = (img_resized / 127.5) - 1
-        img_resized = img_resized.astype(np.float32)
+        img_resized = quantize(img_resized, 128, 127)
         self.fill_input_tensors([img_resized])
         self.invoke()
         out_list = self.get_output_tensors()
@@ -149,7 +149,7 @@ class TextDetectionEngine(InferenceEngine):
         geo_loc_map = dequantize(out_list[1], 128, 127)
         geo_angle = dequantize(out_list[2], 128, 127)
         score_map = (score_map + 1) * 0.5
-        geo_loc_map = (geo_loc_map + 1) * input_shape[1] / 2
+        geo_loc_map = (geo_loc_map + 1) * 256
         geo_angle = 0.7853981633974483 * geo_angle
         geo_map = np.concatenate((geo_loc_map, geo_angle), axis=3)
 
@@ -157,8 +157,8 @@ class TextDetectionEngine(InferenceEngine):
 
         if boxes is not None:
             boxes = boxes[:, :8].reshape((-1, 4, 2))
-            boxes[:, :, 0] /= input_shape[1] / image.shape[1]
-            boxes[:, :, 1] /= input_shape[2] / image.shape[0]
+            boxes[:, :, 0] /= input_shape[1] / image.shape[0]
+            boxes[:, :, 1] /= input_shape[2] / image.shape[1]
 
             output_text = []
             for box in boxes:
@@ -166,6 +166,18 @@ class TextDetectionEngine(InferenceEngine):
                 if np.linalg.norm(box[0] - box[1]) < 5 or np.linalg.norm(box[3] - box[0]) < 5:
                     continue
                 (x_max, x_min), (y_max, y_min) = xy_maxmin(box[:, 0], box[:, 1])
+
+                if x_max > image.shape[0]:
+                    x_max = image.shape[0]
+                if x_min < 0:
+                    x_min = 0
+                if y_max > image.shape[1]:
+                    y_max = image.shape[1]
+                if y_min < 0:
+                    y_min = 0
+
+                cv2.polylines(image, [box.astype(np.int32).reshape(-1, 1, 2)], True, color=(255, 255, 0), thickness=2)
+
                 sub_img = image[y_min:y_max, x_min:x_max]
                 txt = get_text(sub_img)
                 if txt != '':
