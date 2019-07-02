@@ -22,7 +22,7 @@ copyright = '2019, Armando Herrera'
 author = 'Armando Herrera'
 
 # The full version, including alpha/beta/rc tags
-release = '0.0.1'
+release = '0.1.0'
 
 
 # -- General configuration ---------------------------------------------------
