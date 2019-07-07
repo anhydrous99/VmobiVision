@@ -21,7 +21,8 @@ def file_check(p, extension='.tflite'):
     :param extension: Extension to check for
     """
     if not p.is_file() or not str(p).endswith(extension):
-        print(f"Error {p} doesn't exist, or isn't a file with the {extension} extension")
+        print(
+            "Error {p} doesn't exist, or isn't a file with the {extension} extension".format(p=p, extension=extension))
         exit(0)
 
 
