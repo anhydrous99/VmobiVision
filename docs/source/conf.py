@@ -52,3 +52,5 @@ exclude_patterns = []
 # html_static_path = ['_static']
 
 html_theme = "alabaster"
+
+autodoc_mock_imports = ["tensorflow", "_edgetpu_cpp_wrapper"]

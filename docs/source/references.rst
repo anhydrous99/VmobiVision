@@ -9,3 +9,5 @@ References
     :members:
 .. automodule:: inferencing_engines
     :members:
+.. automodule:: TPU_engines
+    :members:

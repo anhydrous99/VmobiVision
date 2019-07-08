@@ -3,10 +3,8 @@ inferencing_engines.py
 =============================================
 Where the inferencing engines/classes reside.
 """
-try:
-    import edgetpu
-except ImportError:
-    import tensorflow as tf
+
+import tensorflow as tf
 import numpy as np
 import cv2
 
@@ -15,14 +13,14 @@ from utils import text_detection, sort_poly, xy_maxmin, get_text, read_labels, d
 
 class InferenceEngine:
     """Base inferencing class that wraps Tensorflow Lite"""
-    def __init__(self, model_path_str):
+    def __init__(self, model_path):
         """
         Initializes InferenceEngine. Creates interpreter, allocates tensors, and grabs input and output details.
 
-        :param model_path_str: Path to Tensorflow Lite Model
+        :param model_path: Path to Tensorflow Lite Model
         """
         # load trained model
-        self.interpreter = tf.lite.Interpreter(model_path=model_path_str)
+        self.interpreter = tf.lite.Interpreter(model_path=model_path)
         self.interpreter.allocate_tensors()
 
         # Get input and output tensors
@@ -79,16 +77,16 @@ class InferenceEngine:
 
 class ObjectDetectionEngine(InferenceEngine):
     """Class that performs Object Detection"""
-    def __init__(self, model_path_str, label_path_dir, score_threshold):
+    def __init__(self, model_path, label_path, score_threshold):
         """
         Initiates the ObjectDetectionEngine class.
 
-        :param model_path_str: Path to SSD object detection model
-        :param label_path_dir: Path to coco format labels
+        :param model_path: Path to SSD object detection model
+        :param label_path: Path to coco format labels
         :param score_threshold: Threshold for detection in the form of a float between 0 and 1
         """
-        InferenceEngine.__init__(self, model_path_str)
-        self.labels = read_labels(label_path_dir)
+        InferenceEngine.__init__(self, model_path)
+        self.labels = read_labels(label_path)
         self.score_threshold = score_threshold
 
     def change_score_threshold(self, score_threshold):
@@ -124,13 +122,13 @@ class ObjectDetectionEngine(InferenceEngine):
 
 class TextDetectionEngine(InferenceEngine):
     """Class that performs Optical Text Recognition"""
-    def __init__(self, model_path_str):
+    def __init__(self, model_path):
         """
         Initiates the TextDetectionEngine class
 
-        :param model_path_str: A path to the EAST model
+        :param model_path: A path to the EAST model
         """
-        InferenceEngine.__init__(self, model_path_str)
+        InferenceEngine.__init__(self, model_path)
 
     def run_inference(self, image):
         """
