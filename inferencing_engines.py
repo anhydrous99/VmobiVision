@@ -27,52 +27,34 @@ class InferenceEngine:
         self.input_details = self.interpreter.get_input_details()
         self.output_details = self.interpreter.get_output_details()
 
-    def get_input_shape(self, index=0):
+    def get_input_shape(self):
         """
-        Gets the shape of an input tensor
+        Gets the shape of the input tensor of the model
 
-        :param index: Index of input tensor
-        :return: Shape of tensor
+        :return: Input shape as a tuple
         """
-        return self.input_details[index]['shape']
+        return self.input_details[0]['shape']
 
-    def fill_input_tensors(self, list_of_numpy_arrays):
-        """
-        Fills the interpreter's input tensors
-
-        :param list_of_numpy_arrays: A list of the input tensors
-        """
-        for index, numpy_array in enumerate(list_of_numpy_arrays):
-            input_shape = self.get_input_shape(index)
-            self.interpreter.set_tensor(self.input_details[index]['index'], numpy_array.reshape(input_shape))
-
-    def invoke(self):
+    def invoke(self, input_tensor, lambda_preprocess=None):
         """
         Invokes the interpreter. Basically has the interpreter run the needed calculation to have the output
         tensors ready.
-        """
-        self.interpreter.invoke()
 
-    def get_output_tensors(self):
-        """
-        Gets the output tensors tensors from the interpreter, assuming the interpreter has been invoked.
-
+        :param input_tensor: Input Tensor (nD numpy array)
+        :param lambda_preprocess: Lambda function to apply to input tensors after resizing
         :return: A list of output tensors (list of numpy arrays)
         """
-        out = []
+        input_shape = self.input_details[0]['shape']
+        resized_tensor = cv2.resize(input_tensor, (input_shape[1], input_shape[2]))
+        if lambda_preprocess:
+            resized_tensor = lambda_preprocess(resized_tensor)
+        self.interpreter.set_tensor(self.input_details[0]['index'], resized_tensor.reshape(input_shape))
+        self.interpreter.invoke()
+
+        output = []
         for detail in self.output_details:
-            out.append(self.interpreter.get_tensor(detail['index']))
-        return out
-
-    def resize_to_network_input(self, image):
-        """
-        Resizes a numpy array to bee the same as the 0th index of the input tensors
-
-        :param image: The numpy array to resize
-        :return: A resized numpy array
-        """
-        input_shape = self.get_input_shape()
-        return cv2.resize(image, (input_shape[1], input_shape[2]))
+            output.append(self.interpreter.get_tensor(detail['index']))
+        return output
 
 
 class ObjectDetectionEngine(InferenceEngine):
@@ -104,10 +86,7 @@ class ObjectDetectionEngine(InferenceEngine):
         :param image: An image(numpy array) to perform inferencing on
         :return: List of the names of detected objects, returns empty list if no object is detected
         """
-        img_resized = self.resize_to_network_input(image)
-        self.fill_input_tensors([img_resized])
-        self.invoke()
-        out_list = self.get_output_tensors()
+        out_list = self.invoke(image)
 
         classes = out_list[1][0]
         scores = out_list[2][0]
@@ -138,12 +117,8 @@ class TextDetectionEngine(InferenceEngine):
         :return: List of text detected, returns empty list of no object is detected
         """
         input_shape = self.get_input_shape()
-        img_resized = self.resize_to_network_input(image)
-        img_resized = (img_resized / 127.5) - 1
-        img_resized = quantize(img_resized, 128, 127)
-        self.fill_input_tensors([img_resized])
-        self.invoke()
-        out_list = self.get_output_tensors()
+        preprocess_function = lambda img : quantize((img / 127.5) - 1, 128, 127)
+        out_list = self.invoke(image, preprocess_function)
 
         # model outputs 3 tensors now, normalized to between 0 and 1
         score_map = dequantize(out_list[0], 128, 127)
