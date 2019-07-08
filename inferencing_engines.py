@@ -3,7 +3,10 @@ inferencing_engines.py
 =============================================
 Where the inferencing engines/classes reside.
 """
-import tensorflow as tf
+try:
+    import edgetpu
+except ImportError:
+    import tensorflow as tf
 import numpy as np
 import cv2
 

@@ -11,8 +11,8 @@ with the base convolution architecture begin the MobileNet V2 architecture. `Tes
 One of the qoals is to have all models quantized and trained with `quantization-aware training
 <https://github.com/tensorflow/tensorflow/tree/master/tensorflow/contrib/quantize>`_ for use with edge-TPUs.
 
-Currently, both models are quantized and can run on edge TPUs but that code would need to be written and
-the models converted. Please see recent commits on the model's github repository <https://github.com/anhydrous99/EAST>.
+Currently, both models are quantized and can run on edge TPUs but that code would need to be written.
+Please see recent commits on the model's github repository <https://github.com/anhydrous99/EAST>.
 If you find an issue, bug, or have a feature request please submit an issue on this project's github repository
 <https://github.com/anhydrous99/Vmobi>.
 
@@ -52,8 +52,9 @@ fully quantized one.::
                    --std_dev_values=127                         \
                    --default_ranges_min=0 --default_ranges_max=6
 
-To run on the edge TPU on a coral, the tensorflow lite model then needs to compiled according to this guide
-<https://coral.withgoogle.com/docs/edgetpu/models-intro/>. To convert the EAST model to a quantized tensorflow lite
+To run on the edge TPU on a coral, you can use the following guide to get the operating system running
+<https://coral.withgoogle.com/docs/edgetpu/models-intro/>. You can then follow the instructions in the
+installation section of the document. To convert the EAST model to a quantized tensorflow lite
 model I created a private `github repo <https://github.com/anhydrous99/EASTkerastotensorflowlite>`_ that uses the
 TFLiteConverter class, it is still a work in progress as the quantized EAST model. If you need access to the github
 project or want the project to be public let me know.
