@@ -3,8 +3,14 @@ inferencing_engines.py
 =============================================
 Where the inferencing engines/classes reside.
 """
+try:
+    from edgetpu.basic.basic_engine import BasicEngine
+    use_tpu = True
+except:
+    import tensorflow as tf
+    use_tpu = False
 
-import tensorflow as tf
+from functools import reduce
 import numpy as np
 import cv2
 
@@ -13,19 +19,24 @@ from utils import text_detection, sort_poly, xy_maxmin, get_text, read_labels, d
 
 class InferenceEngine:
     """Base inferencing class that wraps Tensorflow Lite"""
-    def __init__(self, model_path):
+    def __init__(self, model_path, output_shapes):
         """
         Initializes InferenceEngine. Creates interpreter, allocates tensors, and grabs input and output details.
 
         :param model_path: Path to Tensorflow Lite Model
+        :param output_shapes: List of tuples, each tuple containing the shape of an output tensor
         """
         # load trained model
-        self.interpreter = tf.lite.Interpreter(model_path=model_path)
-        self.interpreter.allocate_tensors()
+        if use_tpu:
+            self.TPU_engine = BasicEngine(model_path)
+        else:
+            self.interpreter = tf.lite.Interpreter(model_path=model_path)
+            self.interpreter.allocate_tensors()
 
-        # Get input and output tensors
-        self.input_details = self.interpreter.get_input_details()
-        self.output_details = self.interpreter.get_output_details()
+            # Get input and output tensors
+            self.input_details = self.interpreter.get_input_details()
+            self.output_details = self.interpreter.get_output_details()
+        self.output_shapes = output_shapes
 
     def get_input_shape(self):
         """
@@ -33,7 +44,10 @@ class InferenceEngine:
 
         :return: Input shape as a tuple
         """
-        return self.input_details[0]['shape']
+        if use_tpu:
+            return self.TPU_engine.get_input_tensor_shape()
+        else:
+            return self.input_details[0]['shape']
 
     def invoke(self, input_tensor, lambda_preprocess=None):
         """
@@ -48,12 +62,24 @@ class InferenceEngine:
         resized_tensor = cv2.resize(input_tensor, (input_shape[1], input_shape[2]))
         if lambda_preprocess:
             resized_tensor = lambda_preprocess(resized_tensor)
-        self.interpreter.set_tensor(self.input_details[0]['index'], resized_tensor.reshape(input_shape))
-        self.interpreter.invoke()
 
         output = []
-        for detail in self.output_details:
-            output.append(self.interpreter.get_tensor(detail['index']))
+        if use_tpu:
+            resized_tensor = resized_tensor.flatten()
+            _, raw_results = self.TPU_engine.RunInference(resized_tensor)
+
+            so_far = 0
+            for index, shape in enumerate(self.output_shapes):
+                output_size = self.TPU_engine.get_output_tensor_size(index)
+                output.append(raw_results[so_far:so_far + output_size].reshape(shape))
+                so_far += output_size
+        else:
+            self.interpreter.set_tensor(self.input_details[0]['index'], resized_tensor.reshape(input_shape))
+            self.interpreter.invoke()
+
+            for index, detail in enumerate(self.output_details):
+                output.append(self.interpreter.get_tensor(detail['index']).reshape(self.output_shapes[index]))
+
         return output
 
 
@@ -67,7 +93,7 @@ class ObjectDetectionEngine(InferenceEngine):
         :param label_path: Path to coco format labels
         :param score_threshold: Threshold for detection in the form of a float between 0 and 1
         """
-        InferenceEngine.__init__(self, model_path)
+        InferenceEngine.__init__(self, model_path, [(1, 10, 4), (1, 10), (1, 10), (1)])
         self.labels = read_labels(label_path)
         self.score_threshold = score_threshold
 
@@ -107,7 +133,7 @@ class TextDetectionEngine(InferenceEngine):
 
         :param model_path: A path to the EAST model
         """
-        InferenceEngine.__init__(self, model_path)
+        InferenceEngine.__init__(self, model_path, [(1, 56, 56, 1), (1, 56, 56, 4), (1, 56, 56, 1)])
 
     def run_inference(self, image):
         """
