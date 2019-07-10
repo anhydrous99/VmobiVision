@@ -24,15 +24,10 @@ Assuming you are using a fresh install of python 3.7, are on the project root di
     python3 -m venv venv
     source venv/bin/activate
     pip install pyttsx3 Sphinx opencv-python-headless setuptools numpy scipy tensorflow pytesseract Pillow keyboard
+    pip install https://vmobipypi.blob.core.windows.net/pypi-blob/lanms_proper-1.0.0-cp37-cp37m-macosx_10_9_x86_64.whl
 
-The lanms-proper package isn't available through the standard pypl repos but you can install it from the github project.
-First make sure you have xcode and git installed then in an arbitrary directory run::
-
-    git clone --recursive https://github.com/safijari/lanms
-    cd lanms
-    python setup.py install
-
-For linking reasons don't delete the lanms directory otherwise, it won't work.
+The lanms-proper package isn't available through the standard pypl repos but you can install from my pypi repo (last
+command above).
 
 Raspberry Pi
 ^^^^^^^^^^^^
