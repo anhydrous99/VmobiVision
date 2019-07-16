@@ -10,7 +10,6 @@ except:
     import tensorflow as tf
     use_tpu = False
 
-from functools import reduce
 import numpy as np
 import cv2
 
