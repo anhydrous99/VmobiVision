@@ -132,7 +132,7 @@ class TextDetectionEngine(InferenceEngine):
 
         :param model_path: A path to the EAST model
         """
-        InferenceEngine.__init__(self, model_path, [(1, 56, 56, 1), (1, 56, 56, 4), (1, 56, 56, 1)])
+        InferenceEngine.__init__(self, model_path, [(1, 80, 80, 1), (1, 80, 80, 4), (1, 80, 80, 1)])
 
     def run_inference(self, image):
         """

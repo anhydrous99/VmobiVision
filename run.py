@@ -34,7 +34,7 @@ def main():
                         default='models/ssd_mobilenet_v2_quantized_300x300_2019_01_03.tflite',
                         help='The model file for object detection')
     parser.add_argument('-t', '--text_detection_model',
-                        default='models/east_mobilenet_v2_quantized_512x512_2019_06_11.tflite',
+                        default='models/east_mobilenet_v2_quantized_320x320_edgetpu.tflite',
                         help='The model file for text detection')
     parser.add_argument('-l', '--object_detection_label',
                         default='models/labels.txt',
