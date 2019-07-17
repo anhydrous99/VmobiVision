@@ -12,6 +12,7 @@ except:
 
 import numpy as np
 import cv2
+import os
 
 from utils import text_detection, sort_poly, xy_maxmin, get_text, read_labels, dequantize, quantize
 
@@ -27,6 +28,7 @@ class InferenceEngine:
         """
         # load trained model
         if use_tpu:
+            model_path = os.path.splitext(model_path) + '_edgetpu.tflite'
             self.TPU_engine = BasicEngine(model_path)
         else:
             self.interpreter = tf.lite.Interpreter(model_path=model_path)

@@ -32,10 +32,10 @@ def main():
     )
     parser.add_argument('-o', '--object_detection_model',
                         default='models/ssd_mobilenet_v2_quantized_300x300_2019_01_03.tflite',
-                        help='The model file for object detection')
+                        help='The model file for object detection, if using edgetpu omit the _edgetpu part of the file')
     parser.add_argument('-t', '--text_detection_model',
-                        default='models/east_mobilenet_v2_quantized_320x320_edgetpu.tflite',
-                        help='The model file for text detection')
+                        default='models/east_mobilenet_v2_quantized_320x320.tflite',
+                        help='The model file for text detection, if using edgetpu omit the _edgetpu part of the file')
     parser.add_argument('-l', '--object_detection_label',
                         default='models/labels.txt',
                         help='Label file for object detection')
